@@ -1,11 +1,21 @@
 // Objects
 
-calcExpression = {
+const calcExpression = {
     visorValue: 0,
     firstOperand: null,
     operator: null,
     waitForSecondOperand: false,
 };
+
+const executeOperation = {
+    "+": (firstOperand, visorValue) =>  { return firstOperand + visorValue},
+    "-": (firstOperand, visorValue) =>  { return firstOperand - visorValue},
+    "*": (firstOperand, visorValue) =>  { return firstOperand * visorValue},
+    "/": (firstOperand, visorValue) =>  { return firstOperand / visorValue},
+    "**": (firstOperand, visorValue) =>  { return firstOperand ** visorValue},
+    "=": (firstOperand) =>  {return firstOperand},
+};
+
 
 //Variables
 
@@ -50,16 +60,33 @@ function insertFloat(dot) {
 }
 
 function operate(selectedOperator) {
-    const { firstOperand, operator, visorValue } = calcExpression
-    const inputedValue = parseFloat(visorValue);
+    const { firstOperand, operator, visorValue} = calcExpression;
+    let inputedValue = parseFloat(visorValue);
 
-    if (firstOperand == null) {
-        calcExpression.firstOperand = inputedValue;
+    if (operator && calcExpression.waitForSecondOperand) {
+        calcExpression.operator = selectedOperator;
+        visorOut.textContent = firstOperand + selectedOperator;
+        return
     }
 
-    if (firstOperand != null) {
-        const result = chooseOperation(operator)
-        return
+    if (firstOperand === null) {
+        calcExpression.firstOperand = inputedValue;
+        visorOut.textContent = inputedValue + selectedOperator;
+    }
+
+    if (firstOperand !== null) {
+
+        let result = executeOperation[operator](firstOperand, inputedValue);
+        visorOut.textContent = firstOperand + operator + inputedValue + " =";
+
+        if (operator === "=") {
+            calcExpression.firstOperand = inputedValue;
+            visorOut.textContent = `${inputedValue}  =`;
+            calcExpression.waitForSecondOperand = true;
+        }
+
+        calcExpression.firstOperand = result;
+        calcExpression.visorValue = result;
     }
 
     calcExpression.waitForSecondOperand = true;
@@ -67,58 +94,6 @@ function operate(selectedOperator) {
 }
 
     // Functions --- Operations
-
-// function sum(a, b) {
-//     return a + b;
-// }
-//
-// function subtract(a, b) {
-//     let subtract = a - b;
-//     return subtract;
-// }
-//
-// function multiply(a, b) {
-//     let product = a * b;
-//     return product;
-// }
-//
-// function divide(a, b) {
-//     let quot = a / b;
-//     if (quot == Infinity) {
-//         return "Error"
-//     } else {
-//         return quot;
-//     }
-// }
-
-// function percentage() {
-
-// }
-
-// function operate(type, a, b) {
-//     a = parseInt(visorInp.textContent);
-//     switch (type) {
-//         case "add":
-//             sum(a, b)
-//             break;
-//         case "subtract":
-//             console.log("subtract");
-//             break;
-//         case "mult":
-//             console.log("mult");
-//             break;
-//         case "div":
-//             console.log("div");
-//             break;
-//         case "perc":
-//             console.log("perc");
-//             break;
-//         default:
-//             console.log("Error")
-//     }
-//     return;
-// }
-
 
 //EventListeners + Execution
 
