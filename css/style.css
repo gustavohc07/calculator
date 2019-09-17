@@ -49,21 +49,30 @@
     height: 80%;
 }
 
+.calculator__buttons button:focus {
+    outline: none;
+}
+
+.calculator__buttons button:active {
+    background-color: lightblue;
+}
+
 .buttons__first-row, .buttons__second-row, .buttons__third-row, .buttons__fourth-row, .buttons__fifth-row {
     display: inline-flex;
     height: 20%;
     justify-content: space-between; 
 }
 
-.buttons__first-row div, .buttons__second-row div, .buttons__third-row div, .buttons__fourth-row div, .buttons__fifth-row div {
+.buttons__first-row button, .buttons__second-row button, .buttons__third-row button, .buttons__fourth-row button, .buttons__fifth-row button {
     display: flex;
     justify-content: center;
     align-items: center;
     border: 1px blue solid;
-    border-radius: 45%;
-    width: 10%;
+    border-radius: 50%;
+    width: 25%;
     margin: 15px;
-    padding: 20px;
     font-weight: bold;
     font-size: 150%;
+    background-color: lightcyan;
 }
+
