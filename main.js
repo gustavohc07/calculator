@@ -1,5 +1,6 @@
 // Objects
 
+
 const calcExpression = {
     visorValue: "0",
     firstOperand: null,
@@ -61,7 +62,10 @@ function inputDigit(digit) {
 }
 
 function insertFloat(dot) {
-    if (calcExpression.waitForSecondOperand === true) return;
+    if (calcExpression.waitForSecondOperand === true) {
+        calcButtons.querySelector('.button__erase').textContent = "AC"; // prevents C button to appear while selecting "." after we got a result
+        return;
+    }
     if (!calcExpression.visorValue.includes(dot)) {
         calcExpression.visorValue += dot;
     }
@@ -132,19 +136,27 @@ function backSpace(){
     visorValue.value = visorValue.value.slice(0, - 1);
 }
 
-//EventListeners + Execution
+//EventListeners
 
 visorInpUpdate(); // Set initial visor value to 0.
 
 
 calcButtons.addEventListener('click', (e) =>{
     const { target } = e;
+
     if (!target.matches('button'))
         return;
+
+    // Change AC to C to implement backspace functionality
+    if (calcExpression.visorValue !== 0 && (calcExpression.waitForSecondOperand === false || calcExpression.operator )) {
+        calcButtons.querySelector('.button__erase').textContent = "C";
+    }
 
     if (target.classList.contains('button__operator')) {
         operate(target.value);
         visorInpUpdate();
+        // Change back to AC after selecting an operator
+        calcButtons.querySelector('.button__erase').textContent = "AC";
         console.log(calcExpression);
         return
     }
@@ -156,7 +168,6 @@ calcButtons.addEventListener('click', (e) =>{
     }
 
     if (target.classList.contains('button__erase')) {
-        console.log('erase', target.value);
         eraseVisor();
         return
     }
@@ -168,34 +179,56 @@ calcButtons.addEventListener('click', (e) =>{
     }
 });
 
+ // Keyboard Functionality
 
-// calcButtons.addEventListener('click', (e) =>{
-//     const { target } = e;
-//     if (!target.matches('button'))
-//         return;
-//
-//     if (target.classList.contains('button__operator')) {
-//         operate(target.value);
-//         visorInpUpdate();
-//         console.log(calcExpression);
-//         return
-//     }
-//
-//     if (target.classList.contains('button__float')) {
-//         insertFloat(target.value);
-//         visorInpUpdate();
-//         return
-//     }
-//
-//     if (target.classList.contains('button__erase')) {
-//         console.log('erase', target.value);
-//         eraseVisor();
-//         return
-//     }
-//
-//     if (target.classList.contains('button__number')) {
-//         inputDigit(target.value);
-//         visorInpUpdate()
-//         return
-//     }
-// });
+document.addEventListener('keydown', (e) =>{
+
+    const keyNumbers = document.querySelectorAll('.button__number');
+    const keyOperators =  document.querySelectorAll('.button__operator');
+
+    let keyOperatorsArray = [];
+    for (i = 0; i < keyOperators.length; i++) {
+        keyOperatorsArray.push(keyOperators[i].value)
+    }
+
+    let keyNumbersArray = [];
+    for (i = 0; i < keyNumbers.length; i++) {
+        keyNumbersArray.push(keyNumbers[i].value)
+    }
+
+    if (e.key === "Enter") {
+        operate("=");
+        visorInpUpdate();
+        return
+    }
+
+    if (e.key === "^") {
+        operate("**");
+        visorInpUpdate();
+        return
+    }
+
+    if (keyOperatorsArray.includes(e.key)) {
+        operate(e.key);
+        visorInpUpdate();
+        return
+    }
+
+    if (e.key === ".") {
+        insertFloat(e.key);
+        visorInpUpdate();
+        return
+    }
+
+    if (e.key === "Backspace") {
+        eraseVisor();
+        return
+    }
+
+    if (keyNumbersArray.includes(e.key)) {
+        inputDigit(e.key);
+        visorInpUpdate()
+        return
+    }
+    return
+});
