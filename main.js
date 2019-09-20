@@ -70,8 +70,10 @@ function operate(selectedOperator) {
     let inputedValue = parseFloat(visorValue);
 
     if (calcExpression.visorValue === "Error") {
-        calcExpression.visorValue = "0";
-        return
+        calcExpression.visorValue = inputedValue || "0";
+        calcExpression.firstOperand = calcExpression.visorValue;
+        calcExpression.operator = selectedOperator || null;
+        return;
     }
 
     if (operator && calcExpression.waitForSecondOperand)  {
@@ -225,6 +227,8 @@ document.addEventListener('keydown', (e) =>{
         keyOperatorsArray.push(keyOperators[i].value)
     }
 
+    keyOperatorsArray.splice(1, 1);
+
     let keyNumbersArray = [];
     for (i = 0; i < keyNumbers.length; i++) {
         keyNumbersArray.push(keyNumbers[i].value)
@@ -233,18 +237,19 @@ document.addEventListener('keydown', (e) =>{
     if (e.key === "Enter") {
         operate("=");
         visorInpUpdate();
-        return
-    }
-
-    if (e.key === "^") {
-        operate("^");
-        visorInpUpdate();
+        calcButtons.querySelector('.button__erase').textContent = "AC";
+        console.log(calcExpression);
         return
     }
 
     if (keyOperatorsArray.includes(e.key)) {
+        // if (calcExpression.operator !== e.key){
+        //     return;
+        // }
         operate(e.key);
         visorInpUpdate();
+        calcButtons.querySelector('.button__erase').textContent = "AC";
+        console.log(calcExpression);
         return
     }
 
@@ -276,7 +281,7 @@ document.addEventListener('keydown', (e) =>{
         if (calcExpression.visorValue !== "0" && (calcExpression.waitForSecondOperand === false || calcExpression.operator )) {
             calcButtons.querySelector('.button__erase').textContent = "C";
         }
+    console.log(calcExpression);
         return
     }
-    return
 });
