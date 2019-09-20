@@ -1,6 +1,5 @@
 // Objects
 
-
 const calcExpression = {
     visorValue: "0",
     firstOperand: null,
@@ -13,7 +12,7 @@ const executeOperation = {
     "-": (firstOperand, visorValue) =>  { return firstOperand - visorValue},
     "*": (firstOperand, visorValue) =>  { return firstOperand * visorValue},
     "/": (firstOperand, visorValue) =>  { return firstOperand / visorValue},
-    "**": (firstOperand, visorValue) =>  { return firstOperand ** visorValue},
+    "^": (firstOperand, visorValue) =>  { return firstOperand ** visorValue},
     "=": (firstOperand, visorValue) =>  {return visorValue},
     "sqrt": (firstOperand, visorValue) => {return Math.round(Math.sqrt(visorValue) *100)/100} ,
     "%": (firstOperand, visorValue) => {return visorValue/100},
@@ -24,11 +23,6 @@ const executeOperation = {
     // Numbers 
 
 const calcButtons = document.querySelector('.calculator__buttons');
-
-    //Erase 
-
-const btnErase = document.querySelector(".button__erase");
-
 
     // Visor 
 
@@ -47,7 +41,7 @@ function eraseVisor() {
     calcExpression.operator = null;
     calcExpression.firstOperand= null;
     calcExpression.waitForSecondOperand = false;
-    visorInp.textContent = calcExpression.visorValue;
+    visorInpUpdate()
     return;
 }
 
@@ -75,11 +69,17 @@ function operate(selectedOperator) {
     const { firstOperand, operator, visorValue} = calcExpression;
     let inputedValue = parseFloat(visorValue);
 
+    if (calcExpression.visorValue === "Error") {
+        calcExpression.visorValue = "0";
+        return
+    }
+
     if (operator && calcExpression.waitForSecondOperand)  {
         if (selectedOperator === "sqrt" || selectedOperator === "%") {
             let result = executeOperation[selectedOperator](firstOperand, inputedValue);
             if ((calcExpression.visorValue < 0 || firstOperand < 0) && selectedOperator === "sqrt"){
                 calcExpression.visorValue = "Error";
+                visorOut.textContent = "";
                 calcExpression.waitForSecondOperand = true;
                 calcExpression.firstOperand = null;
                 calcExpression.operator = null;
@@ -87,7 +87,11 @@ function operate(selectedOperator) {
             }
             calcExpression.visorValue = result;
             calcExpression.firstOperand = result;
-            visorOut.textContent = inputedValue + selectedOperator;
+            if (selectedOperator === "sqrt") {
+                visorOut.textContent = "\u221A" + inputedValue + "=";
+            } else {
+                visorOut.textContent = inputedValue + selectedOperator + "=";
+            }
             calcExpression.waitForSecondOperand = true;
             return;
         }
@@ -105,7 +109,11 @@ function operate(selectedOperator) {
             let result = Math.round(executeOperation[selectedOperator](firstOperand, inputedValue) * 100)/100;
             calcExpression.visorValue = result;
             calcExpression.firstOperand = result;
-            visorOut.textContent = inputedValue + selectedOperator;
+            if (selectedOperator === "sqrt") {
+                visorOut.textContent = "\u221A" + inputedValue + "=";
+            } else {
+                visorOut.textContent = inputedValue + selectedOperator + "=";
+            }
             calcExpression.waitForSecondOperand = true;
             calcExpression.operator = selectedOperator;
             return;
@@ -119,9 +127,23 @@ function operate(selectedOperator) {
 
         if (operator !== "=") {
             visorOut.textContent = firstOperand + operator + inputedValue + "=";
-        } else {
+        } else  {
             visorOut.textContent = visorValue + "="
         }
+
+        switch (selectedOperator) {
+            case "sqrt":
+                result = Math.round(executeOperation[selectedOperator](firstOperand, inputedValue) *100)/100;
+                calcExpression.firstOperand = inputedValue;
+                visorOut.textContent = '\u221A' + visorValue + "=";
+                break;
+            case "%":
+                result = executeOperation[selectedOperator](firstOperand, inputedValue);
+                calcExpression.firstOperand = inputedValue;
+                visorOut.textContent = visorValue + selectedOperator + "=";
+                break;
+        }
+
         calcExpression.firstOperand = result;
         calcExpression.visorValue = result;
     }
@@ -132,25 +154,24 @@ function operate(selectedOperator) {
 }
 
 function backSpace(){
-    const {visorValue} = calcExpression
-    visorValue.value = visorValue.value.slice(0, - 1);
+    const {visorValue} = calcExpression;
+    visorValue.toString();
+    let tempArray = visorValue.split("");
+    tempArray.pop();
+    calcExpression.visorValue = tempArray.join("");
+    visorInpUpdate();
+    // }
 }
 
 //EventListeners
 
 visorInpUpdate(); // Set initial visor value to 0.
 
-
 calcButtons.addEventListener('click', (e) =>{
     const { target } = e;
 
     if (!target.matches('button'))
         return;
-
-    // Change AC to C to implement backspace functionality
-    if (calcExpression.visorValue !== 0 && (calcExpression.waitForSecondOperand === false || calcExpression.operator )) {
-        calcButtons.querySelector('.button__erase').textContent = "C";
-    }
 
     if (target.classList.contains('button__operator')) {
         operate(target.value);
@@ -168,14 +189,27 @@ calcButtons.addEventListener('click', (e) =>{
     }
 
     if (target.classList.contains('button__erase')) {
-        eraseVisor();
+         if (calcButtons.querySelector('.button__erase').textContent === "AC" || calcExpression.waitForSecondOperand && calcExpression.operator) {
+             eraseVisor();
+         } else {
+             backSpace();
+         }
+
+        if (calcExpression.visorValue === "") {
+            calcExpression.visorValue = "0";
+            visorInpUpdate();
+            calcButtons.querySelector('.button__erase').textContent = "AC"
+        }
         return
     }
 
     if (target.classList.contains('button__number')) {
         inputDigit(target.value);
-        visorInpUpdate()
-        return
+        visorInpUpdate();
+        // Change AC to C to implement backspace functionality
+        if (calcExpression.visorValue !== "0" && (calcExpression.waitForSecondOperand === false || calcExpression.operator )) {
+            calcButtons.querySelector('.button__erase').textContent = "C";
+        }
     }
 });
 
@@ -203,7 +237,7 @@ document.addEventListener('keydown', (e) =>{
     }
 
     if (e.key === "^") {
-        operate("**");
+        operate("^");
         visorInpUpdate();
         return
     }
@@ -221,13 +255,27 @@ document.addEventListener('keydown', (e) =>{
     }
 
     if (e.key === "Backspace") {
-        eraseVisor();
+        if (calcButtons.querySelector('.button__erase').textContent === "AC" || calcExpression.waitForSecondOperand && calcExpression.operator) {
+            eraseVisor();
+        } else {
+            backSpace();
+        }
+
+        if (calcExpression.visorValue === "") {
+            calcExpression.visorValue = "0";
+            visorInpUpdate();
+            calcButtons.querySelector('.button__erase').textContent = "AC"
+        }
         return
     }
 
     if (keyNumbersArray.includes(e.key)) {
         inputDigit(e.key);
         visorInpUpdate()
+        // Change AC to C to implement backspace functionality
+        if (calcExpression.visorValue !== "0" && (calcExpression.waitForSecondOperand === false || calcExpression.operator )) {
+            calcButtons.querySelector('.button__erase').textContent = "C";
+        }
         return
     }
     return
