@@ -145,10 +145,9 @@ function operate(selectedOperator) {
                 result = executeOperation[selectedOperator](firstOperand, inputedValue);
                 calcExpression.firstOperand = inputedValue;
                 visorOut.textContent = visorValue + selectedOperator + "=";
-                return;
-
+                break;
         }
-        if (operator === "sqrt" || operator === "%") {
+        if (operator === "sqrt") {
             result = executeOperation[selectedOperator](firstOperand, inputedValue);
         }
 
