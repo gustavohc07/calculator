@@ -18,7 +18,7 @@ const executeOperation = {
     "%": (firstOperand, visorValue) => {return visorValue/100},
 };
 
-//Variables
+//Variables -------------------------------------------------------------------------------------
 
     // Numbers 
 
@@ -30,7 +30,7 @@ const visorOut = document.querySelector(".visor__output");
 const visorInp = document.querySelector(".visor__input");
 
 
-//Functions
+//Functions -------------------------------------------------------------------------------------
 
 function visorInpUpdate() {
     visorInp.textContent = calcExpression.visorValue
@@ -42,7 +42,6 @@ function eraseVisor() {
     calcExpression.firstOperand= null;
     calcExpression.waitForSecondOperand = false;
     visorInpUpdate()
-    return;
 }
 
 function inputDigit(digit) {
@@ -87,13 +86,13 @@ function operate(selectedOperator) {
                 calcExpression.operator = null;
                 return;
             }
-            calcExpression.visorValue = result;
-            calcExpression.firstOperand = result;
             if (selectedOperator === "sqrt") {
                 visorOut.textContent = "\u221A" + inputedValue + "=";
             } else {
                 visorOut.textContent = inputedValue + selectedOperator + "=";
             }
+            calcExpression.visorValue = result;
+            calcExpression.firstOperand = result;
             calcExpression.waitForSecondOperand = true;
             return;
         }
@@ -127,23 +126,30 @@ function operate(selectedOperator) {
     if (firstOperand !== null) {
         let result = Math.round(executeOperation[operator](firstOperand, inputedValue) * 100)/100;
 
-        if (operator !== "=") {
+        if (operator !== "=" && operator !== "sqrt" && operator !== "%") {
             visorOut.textContent = firstOperand + operator + inputedValue + "=";
-        } else  {
+        } else if (operator !== "sqrt" && operator !== "%") {
             visorOut.textContent = visorValue + "="
+        } else {
+            visorOut.textContent = firstOperand + selectedOperator + inputedValue + "="
         }
 
         switch (selectedOperator) {
             case "sqrt":
                 result = Math.round(executeOperation[selectedOperator](firstOperand, inputedValue) *100)/100;
                 calcExpression.firstOperand = inputedValue;
+                calcExpression.operator = null;
                 visorOut.textContent = '\u221A' + visorValue + "=";
                 break;
             case "%":
                 result = executeOperation[selectedOperator](firstOperand, inputedValue);
                 calcExpression.firstOperand = inputedValue;
                 visorOut.textContent = visorValue + selectedOperator + "=";
-                break;
+                return;
+
+        }
+        if (operator === "sqrt" || operator === "%") {
+            result = executeOperation[selectedOperator](firstOperand, inputedValue);
         }
 
         calcExpression.firstOperand = result;
@@ -165,7 +171,7 @@ function backSpace(){
     // }
 }
 
-//EventListeners
+//EventListeners --------------------------------------------------------------------------------
 
 visorInpUpdate(); // Set initial visor value to 0.
 
@@ -215,7 +221,7 @@ calcButtons.addEventListener('click', (e) =>{
     }
 });
 
- // Keyboard Functionality
+ // Keyboard Functionality ----------------------------------------------------------------------
 
 document.addEventListener('keydown', (e) =>{
 
@@ -223,33 +229,26 @@ document.addEventListener('keydown', (e) =>{
     const keyOperators =  document.querySelectorAll('.button__operator');
 
     let keyOperatorsArray = [];
-    for (i = 0; i < keyOperators.length; i++) {
+    for (let i = 0; i < keyOperators.length; i++) {
         keyOperatorsArray.push(keyOperators[i].value)
     }
 
-    keyOperatorsArray.splice(1, 1);
-
     let keyNumbersArray = [];
-    for (i = 0; i < keyNumbers.length; i++) {
+    for (let i = 0; i < keyNumbers.length; i++) {
         keyNumbersArray.push(keyNumbers[i].value)
     }
 
-    if (e.key === "Enter") {
-        operate("=");
-        visorInpUpdate();
-        calcButtons.querySelector('.button__erase').textContent = "AC";
-        console.log(calcExpression);
-        return
-    }
-
-    if (keyOperatorsArray.includes(e.key)) {
-        // if (calcExpression.operator !== e.key){
-        //     return;
-        // }
-        operate(e.key);
-        visorInpUpdate();
-        calcButtons.querySelector('.button__erase').textContent = "AC";
-        console.log(calcExpression);
+    if (keyOperatorsArray.includes(e.key) || e.key === "Enter") {
+        if (e.key === "Enter") {
+            e.preventDefault(); // If sqrt is selected, "Enter" was triggering it all the time. preventDefault() used to stop this behavior.
+            operate("=");
+            visorInpUpdate();
+            calcButtons.querySelector('.button__erase').textContent = "AC";
+        } else {
+            operate(e.key);
+            visorInpUpdate();
+            calcButtons.querySelector('.button__erase').textContent = "AC";
+        }
         return
     }
 

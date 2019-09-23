@@ -12,7 +12,7 @@
     border: 1px black solid;
     height: 600px;
     width: 450px;
-    /* flex-direction: column; */
+    background-color: #ECEBE4
 }
 
 .calculator__visor {
@@ -20,6 +20,8 @@
     flex-direction: column;
     height: 20%;
     margin : 1em;
+    border: 1px black solid;
+    background-color: #0A2E36;
 }
 
 .visor__output {
@@ -28,8 +30,8 @@
     justify-content: flex-end;
     padding-right: 1em;
     height: 40%;
-    border: 1px pink solid;
-    color: gray;
+    color: #ACABA6;
+    overflow: hidden;
 }
 
 .visor__input {
@@ -37,15 +39,16 @@
     align-items: center;
     justify-content: flex-end;
     padding-right: 1em;
-    height: 60%;
-    border: 1px pink solid;
-    font-size: 1.5em;
+    height: 70%;
+    border-top: 1px lightgray solid;
+    font-size: 2em;
+    color: antiquewhite;
+    overflow: hidden;
 }
 
 .calculator__buttons {
     display: flex;
     flex-direction: column;
-    border: 1px blue solid;
     height: 80%;
 }
 
@@ -54,12 +57,12 @@
 }
 
 .calculator__buttons button:active {
-    background-color: lightblue;
+    /*background-color: #5B5B5B;*/
 }
 
 .buttons__first-row, .buttons__second-row, .buttons__third-row, .buttons__fourth-row, .buttons__fifth-row {
     display: inline-flex;
-    height: 20%;
+    height: 50%;
     justify-content: space-between; 
 }
 
@@ -67,12 +70,49 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    border: 1px blue solid;
-    border-radius: 50%;
-    width: 25%;
-    margin: 15px;
+    /*border: 1px blue solid;*/
+    border-radius: 35%;
+    width: 30%;
+    margin: 10px;
     font-weight: bold;
-    font-size: 150%;
-    background-color: lightcyan;
+    font-size: 170%;
+    /*background-color: lightcyan;*/
 }
+
+.button__operator--color {
+    background-color: #424B54;
+    color: antiquewhite;
+}
+.button__operator--color:active {
+    background-color: #373E45;
+    color: antiquewhite;
+}
+
+.button__equal--color {
+    background-color: #6320EE;
+    color: antiquewhite;
+}
+
+.button__equal--color:active {
+    background-color: #521BC3
+}
+
+.button__erase--color {
+    background-color: #E1CE7A;
+}
+
+.button__erase--color:active {
+    background-color: #A49659;
+}
+
+.button__number--color, .button__float--color {
+    background-color: #E2D4B7;
+}
+
+.button__number--color:active, .button__float--color:active {
+    background-color: #A59B86;
+}
+#8075FF
+#424B54
+#E1CE7A
 
